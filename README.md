@@ -18,9 +18,7 @@ cp .env.example .env
 mkdir data
 ```
 
--and use it's name in the .env for example /data
-- in the .env:
-
+- and use it's name in the .env for example /data.
 ```
 DATA_PATH="data"
 ```
