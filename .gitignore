@@ -1,0 +1,13 @@
+.env
+
+#composer
+composer.json
+composer.lock
+/vendor/
+
+#simple_html_dom
+simple_html_dom.php
+
+#storage folders
+/data/
+
