@@ -7,6 +7,7 @@ namespace App;
 use App\Database;
 use App\Services\UrlService;
 use App\Traits\Logger;
+use InvalidArgumentException;
 use PDOException;
 
 final class Crawler
@@ -14,7 +15,8 @@ final class Crawler
     use Logger;
     private Database $db;
     private UrlService $urlService;
-    private array $urls;
+    private array $urls = [];
+    private array $visited = [];
 
     public function __construct(string $urlsFile, string $method)
     {
@@ -40,8 +42,31 @@ final class Crawler
 
             echo "Processing: $url \n";
             $this->info("processing $url");
+            
             //normalize url
-            //save duplicates
+             try {
+                //normalize url to standards
+                $normalized = $this->urlService->normalizeUrl($url);
+                $this->info("normalized the url to $normalized");
+            } catch (InvalidArgumentException $e) {
+                $this->error("url normalize error:\n {$e->getMessage()}");
+                continue;
+            }
+
+            //check for duplicates
+            $hash = sha1($normalized);
+            if (in_array($hash, $this->visited)) {
+                echo "already visited ..skipping \n";
+                $this->warning("already visited this url, will skip");
+                continue;
+            }
+
+             //skip if url is not valid
+            if (!$this->urlService->isValidUrl($normalized)) {
+                $this->error("url failed urlHandle Validation");
+                continue;
+            }
+            $this->info("validated url");
             //parse
             //save
         }

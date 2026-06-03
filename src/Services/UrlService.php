@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Traits\Logger;
+use GuzzleHttp\Psr7\Uri;
 
 class UrlService
 {
@@ -38,5 +39,66 @@ class UrlService
             $this->warning("URL file not found. will use hardcoded");
             return self::URLS;
         }
+    }
+
+    public function normalizeUrl(string $url, array $removedParams = []): string
+    {
+        $uri = new Uri($url);
+
+        // Remove fragment
+        $uri = $uri->withFragment('');
+
+        // Lowercase scheme and host
+        $scheme = strtolower($uri->getScheme());
+        $host = strtolower($uri->getHost());
+        $uri = $uri->withScheme($scheme)->withHost($host);
+
+        // Remove default ports
+        $port = $uri->getPort();
+        if (($scheme === 'http' && $port === 80) ||
+            ($scheme === 'https' && $port === 443)
+        ) {
+            $uri = $uri->withPort(null);
+        }
+
+        // Sort and filter query parameters
+        if ($uri->getQuery()) {
+            parse_str($uri->getQuery(), $params);
+
+            // Remove specified tracking parameters
+            foreach ($removedParams as $param) {
+                unset($params[$param]);
+            }
+
+            // Sort parameters alphabetically
+            ksort($params);
+            $query = http_build_query($params, '', '&');
+            $uri = $uri->withQuery($query);
+        }
+
+        return (string) $uri;
+    }
+
+
+    function isValidUrl(string $url): bool
+    {
+        $uri = new Uri($url);
+
+        // Must have scheme and host
+        if (!$uri->getScheme() || !$uri->getHost()) {
+            return false;
+        }
+
+        // Only http/https
+        if (!in_array($uri->getScheme(), ['http', 'https'])) {
+            return false;
+        }
+
+        // Avoid mailto, javascript, etc.
+        if (strpos($url, 'mailto:') === 0 || strpos($url, 'javascript:') === 0) {
+            return false;
+        }
+
+        return true;
     }
 }
