@@ -1,0 +1,21 @@
+{
+    "name": "kostas/crawler",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "kostas",
+            "email": "awkostas@gmail.com"
+        }
+    ],
+    "require-dev": {
+        "zoon/puphpeteer": "^2.4"
+    },
+    "require": {
+        "guzzlehttp/psr7": "^2.11",
+        "vlucas/phpdotenv": "^5.6"
+    }
+}

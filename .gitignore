@@ -1,13 +1,17 @@
 .env
 
 #composer
-composer.json
 composer.lock
 /vendor/
 
 #simple_html_dom
 simple_html_dom.php
 
-#storage folders
+#data and script folders
 /data/
+/scripts/
 
+# node modules
+/node_modules/
+package.json
+package-lock.json

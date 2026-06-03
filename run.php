@@ -30,8 +30,5 @@ if ($cli->hasFlags()) {
     }
 }
 
-
-
-
 $app = new Crawler($urlsFile, $method);
 $app->run();

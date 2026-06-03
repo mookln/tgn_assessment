@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App;
 
 use App\Database;
+use App\Services\Fetcher;
 use App\Services\UrlService;
 use App\Traits\Logger;
 use InvalidArgumentException;
@@ -15,6 +16,7 @@ final class Crawler
     use Logger;
     private Database $db;
     private UrlService $urlService;
+    private Fetcher $fetcher;
     private array $urls = [];
     private array $visited = [];
 
@@ -22,6 +24,7 @@ final class Crawler
     {
         $this->db = new Database();
         $this->urlService = new UrlService();
+        $this->fetcher = new Fetcher($method);
         //get url list
         $this->urls = $this->urlService->loadUrls($urlsFile);
     }
@@ -42,9 +45,9 @@ final class Crawler
 
             echo "Processing: $url \n";
             $this->info("processing $url");
-            
+
             //normalize url
-             try {
+            try {
                 //normalize url to standards
                 $normalized = $this->urlService->normalizeUrl($url);
                 $this->info("normalized the url to $normalized");
@@ -54,6 +57,7 @@ final class Crawler
             }
 
             //check for duplicates
+
             $hash = sha1($normalized);
             if (in_array($hash, $this->visited)) {
                 echo "already visited ..skipping \n";
@@ -61,12 +65,24 @@ final class Crawler
                 continue;
             }
 
-             //skip if url is not valid
+            //skip if url is not valid
             if (!$this->urlService->isValidUrl($normalized)) {
                 $this->error("url failed urlHandle Validation");
                 continue;
             }
             $this->info("validated url");
+
+            //fetch
+            $html = $this->fetcher->fetch($normalized);
+            $this->info("fetched content");
+
+            $this->visited[] = $hash;
+
+            if ($html === false) {
+                $this->error("failed to fetch : {$normalized}");
+                echo "failed to fetch \n";
+                continue;
+            }
             //parse
             //save
         }
