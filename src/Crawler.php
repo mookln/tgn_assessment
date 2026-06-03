@@ -26,6 +26,7 @@ final class Crawler
     public function __construct(string $urlsFile, string $method)
     {
         $this->db = new Database();
+// src/Logger.php
         $this->urlService = new UrlService();
         $this->fetcher = new Fetcher($method);
         $this->parser = new ProductParser();
@@ -43,7 +44,8 @@ final class Crawler
             echo "Database error. Check log.\n";
             return;
         }
-        $products = [];
+
+
         //iterate url list
         foreach ($this->urls as $url) {
 
@@ -75,6 +77,7 @@ final class Crawler
                 continue;
             }
             $this->info("validated url");
+// src/Logger.php
 
             //fetch
             $html = $this->fetcher->fetch($normalized);
@@ -99,12 +102,23 @@ final class Crawler
             echo "parsed successfuly \n";
             $this->info("parsed successfuly");
             //save
-            $products[] = $product;
+
+            // log missing fields
+            $missing = [];
+            if ($product['title'] === null) $missing[] = 'title';
+            if ($product['price'] === null) $missing[] = 'price';
+            if ($product['availability'] === null) $missing[] = 'availability';
+            if (!empty($missing)) {
+                $this->warning("Missing fields for {$normalized}: " . implode(',', $missing));
+            }
+
+            try {
+                //insert product to the database
+                $this->db->insertProduct($product['title'], $product['price'], $product['availability']);
+            } catch (PDOException $e) {
+                $this->error("DB insert failed for {$normalized}: " . $e->getMessage());
+            }
         }
-        print_r($products);
-
-
-        //exit;
         echo "Done. Check data/products.sqlite and data/log.txt\n";
     }
 }

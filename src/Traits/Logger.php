@@ -1,5 +1,4 @@
 <?php
-// src/Logger.php
 declare(strict_types=1);
 
 namespace App\Traits;
