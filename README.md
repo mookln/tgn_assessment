@@ -12,12 +12,13 @@ PHP web crawler for tgndata
 cp .env.example .env
 ```
 
-- create a folder in the project for your database and logs to be stored and use it's name in the .env for example /data
+- create a folder in the project for your database and logs to be stored
 
 ```bash
 mkdir data
 ```
 
+-and use it's name in the .env for example /data
 - in the .env:
 
 ```
