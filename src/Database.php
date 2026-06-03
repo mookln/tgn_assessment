@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App;
@@ -14,7 +15,7 @@ class Database
 
     public function __construct()
     {
-        $this->dbPath = dirname(__DIR__) . "/{$_ENV['DATA_PATH']}/{$_ENV['DB_FILE']}";
+        $this->dbPath = dirname(__DIR__) . "/{$_ENV['DATA_PATH']}/{$_ENV['DB_NAME']}.{$_ENV['DB_TYPE']}";
         $this->connect();
     }
 

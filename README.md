@@ -8,9 +8,20 @@ PHP web crawler for tgndata
 - navigate in the project
 - create a .env file and copy the .env.example contents into it.
 
+```bash
+cp .env.example .env
 ```
-DB_TYPE=sqlite
-DB_DATABASE=databasename.sqlite
+
+- create a folder in the project for your database and logs to be stored and use it's name in the .env for example /data
+
+```bash
+mkdir data
+```
+
+- in the .env:
+
+```
+DATA_PATH="data"
 ```
 
 - install the composer dependecies
