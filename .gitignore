@@ -4,9 +4,6 @@
 composer.lock
 /vendor/
 
-#simple_html_dom
-simple_html_dom.php
-
 #data folder
 /data/
 
