@@ -48,6 +48,8 @@ php run.php
 ```bash
 php run.php --fetch=curl --urlfile=/path/to/file.txt
 ```
+-- If you want to use a urlfle then put the urls without quotes or commas. just a url per row.
+
 
 ## Results
 
