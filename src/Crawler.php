@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App;
 
 use App\Database;
+use App\Product\ProductParser;
 use App\Services\Fetcher;
 use App\Services\UrlService;
 use App\Traits\Logger;
 use InvalidArgumentException;
 use PDOException;
+use RuntimeException;
 
 final class Crawler
 {
@@ -17,6 +19,7 @@ final class Crawler
     private Database $db;
     private UrlService $urlService;
     private Fetcher $fetcher;
+    private ProductParser $parser;
     private array $urls = [];
     private array $visited = [];
 
@@ -25,6 +28,7 @@ final class Crawler
         $this->db = new Database();
         $this->urlService = new UrlService();
         $this->fetcher = new Fetcher($method);
+        $this->parser = new ProductParser();
         //get url list
         $this->urls = $this->urlService->loadUrls($urlsFile);
     }
@@ -39,7 +43,7 @@ final class Crawler
             echo "Database error. Check log.\n";
             return;
         }
-
+        $products = [];
         //iterate url list
         foreach ($this->urls as $url) {
 
@@ -84,8 +88,20 @@ final class Crawler
                 continue;
             }
             //parse
+            try {
+                //parse the product of the page.
+                $product = $this->parser->parse($html);
+            } catch (RuntimeException $e) {
+                $this->error("parse error for {$normalized}: {$e->getMessage()}");
+                echo "failed to parse \n";
+                continue;
+            }
+            echo "parsed successfuly \n";
+            $this->info("parsed successfuly");
             //save
+            $products[] = $product;
         }
+        print_r($products);
 
 
         //exit;
